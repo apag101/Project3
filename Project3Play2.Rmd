@@ -1,0 +1,73 @@
+---
+title: "Project3Play2"
+author: "Anthony Pagan"
+date: "October 17, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Libraries
+
+```{r message=FALSE, warning=FALSE}
+library(dplyr)
+library(tidyr)
+library(readxl)
+library(ggplot2)
+library(plotrix)
+library(plotly)
+library(gapminder) 
+library(RMySQL)
+memory.limit()
+## To increase the storage capacity
+memory.limit(size=32000)
+```
+
+## CSV files to data frames
+
+```{r echo=FALSE}
+apprDstr<-data.frame(read.csv(file = 'https://raw.githubusercontent.com/apag101/CUNYSPS/master/IS607/Project3/APPR_DISTRICT_RESEARCHER_FILE_DATA.csv', header = TRUE, sep= ",", stringsAsFactors = FALSE))
+
+apprSch<-data.frame(read.csv(file = 'https://raw.githubusercontent.com/apag101/CUNYSPS/master/IS607/Project3/APPR_SCHOOL_RESEARCHER_FILE_DATA.csv', header = TRUE, sep= ",", stringsAsFactors = FALSE))
+
+apprState<-data.frame(read.csv(file = 'https://raw.githubusercontent.com/apag101/CUNYSPS/master/IS607/Project3/APPR_STATEWIDE_RESEARCHER_FILE_DATA.csv', header = TRUE, sep= ",", stringsAsFactors = FALSE))
+
+```
+
+#Import data to MYSQL for analysis
+
+```{r}
+mydb = dbConnect(MySQL(), user='root', password='123456', dbname='education', host='localhost')
+
+dbListTables(mydb)
+
+dbRemoveTable(mydb, "apprdstr")
+dbWriteTable(mydb, "apprDstr",apprDstr, overwrite = TRUE)
+
+dbRemoveTable(mydb, "apprsch")
+dbWriteTable(mydb, "apprSch",apprSch, overwrite = TRUE)
+
+dbRemoveTable(mydb, "apprstate")
+dbWriteTable(mydb, "apprState",apprState, overwrite = TRUE)
+
+dbDisconnect(mydb)
+```
+
+#Run Query to extract join 2 tables and extract 1million rows
+
+```{r}
+mydb = dbConnect(MySQL(), user='root', password='123456', dbname='education', host='localhost')
+
+joineddata<-dbGetQuery(mydb, "select d.educator_id as EducatorD_ID, d.DISTRICT_NAME, s.Educator_id as EducatorS_ID, s.School_name, district_needs_category, per_pupil_expenditure,
+d.overall_score, d.overall_rating, s.growth_rating from apprdstr d
+inner join apprsch s on  d.district_beds = s.district_beds limit 1000000")
+
+dbDisconnect(mydb)
+```
+
+#Write data back to CSV for team to review
+```{r}
+write.csv(joineddata, file="JoinedEDUData.csv")
+```
