@@ -62,6 +62,22 @@ inner join apprsch s on  d.district_beds = s.district_beds limit 1000000")
 dbDisconnect(mydb)
 ```
 
+```{r dbViz}
+ui <- basicPage(
+  h2("The mtcars data"),
+  DT::dataTableOutput("mytable")
+)
+
+server <- function(input, output) {
+  output$mytable = DT::renderDataTable({
+    mtcars
+  })
+}
+
+shinyApp(ui, server)
+```
+
+
 #Write data back to CSV for team to review
 ```{r csvOut}
 write.csv(joineddata, file="JoinedEDUData.csv")
