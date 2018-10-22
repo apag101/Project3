@@ -4,6 +4,7 @@ date: "October 17, 2018"
 output: html_document
 ---
 
+
 #Libraries
 ```{r message=FALSE, warning=FALSE}
 library(dplyr)
@@ -23,19 +24,14 @@ memory.limit(size=32000)
 
 ## CSV files to data frames
 
-```{r echo=FALSE}
-apprDstr<-data.frame(read.csv(file = 'APPR_DISTRICT_RESEARCHER_FILE_DATA.csv', header = TRUE, sep= ",", stringsAsFactors = FALSE))
-apprSch<-data.frame(read.csv(file = 'APPR_SCHOOL_RESEARCHER_FILE_DATA.csv', header = TRUE, sep= ",", stringsAsFactors = FALSE))
-apprState<-data.frame(read.csv(file = 'APPR_STATEWIDE_RESEARCHER_FILE_DATA.csv', header = TRUE, sep= ",", stringsAsFactors = FALSE))
-#d<-apprDstr%>%
-    #filter(OVERALL_SCORE != "Suspended" & OVERALL_SCORE > 98)%>%
-    #filter(OVERALL_RATING == "Highly Effective")
-#h<-inner_join(d, apprSch, by="DISTRICT_BEDS")
-#View(h)
-#fapprState<-
-    #apprSch%>%
-    #select(PER_PUPIL_EXPENDITURE)%>%unique()
-    #filter(EDUCATOR_ID == 5019496)
+```{r echo=TRUE}
+apprDstr<-data.frame(read.csv(file = 'https://raw.githubusercontent.com/apag101/CUNYSPS/master/IS607/Project3/APPR_DISTRICT_RESEARCHER_FILE_DATA.csv', header = TRUE, sep= ",", stringsAsFactors = FALSE))
+
+apprSch<-data.frame(read.csv(file = 'https://raw.githubusercontent.com/apag101/CUNYSPS/master/IS607/Project3/APPR_SCHOOL_RESEARCHER_FILE_DATA.csv', header = TRUE, sep= ",", stringsAsFactors = FALSE))
+
+apprState<-data.frame(read.csv(file = 'https://raw.githubusercontent.com/apag101/CUNYSPS/master/IS607/Project3/APPR_STATEWIDE_RESEARCHER_FILE_DATA.csv', header = TRUE, sep= ",", stringsAsFactors = FALSE))
+
+
 ```
 
 #Import data to MYSQL for analysis
@@ -62,22 +58,6 @@ inner join apprsch s on  d.district_beds = s.district_beds limit 1000000")
 dbDisconnect(mydb)
 ```
 
-```{r dbViz}
-ui <- basicPage(
-  h2("The mtcars data"),
-  DT::dataTableOutput("mytable")
-)
-
-server <- function(input, output) {
-  output$mytable = DT::renderDataTable({
-    mtcars
-  })
-}
-
-shinyApp(ui, server)
-```
-
-
 #Write data back to CSV for team to review
 ```{r csvOut}
 write.csv(joineddata, file="JoinedEDUData.csv")
@@ -85,9 +65,9 @@ write.csv(joineddata, file="JoinedEDUData.csv")
 
 # Load Data
 ```{r csvLoad}
-x <- "/Users/codedesk/Documents/CUNY_SPS/Data_607/JoinedEDUData.csv"
+x <- "JoinedEDUData.csv"
 x <- read.csv(x, header = TRUE)
-x
+head(x)
 ```
 
 # Check Levels
